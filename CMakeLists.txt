@@ -25,5 +25,5 @@ endif()
 # Include sub-projects.
 
 
-add_executable(${PROJECT_NAME} src/main.cpp)
+add_executable(${PROJECT_NAME} src/main.cpp "include/Ray.h" "include/Vector3.h")
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL2::SDL2 SDL2::SDL2main)
