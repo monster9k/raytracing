@@ -1,0 +1,22 @@
+﻿# --- Bỏ qua các thư mục build rác (Cái này quan trọng nhất) ---
+out/
+build/
+bin/
+lib/
+
+# --- Bỏ qua file cấu hình riêng của Visual Studio ---
+.vs/
+*.user
+*.suo
+*.ipch
+*.aps
+
+# --- Bỏ qua file cài đặt người dùng CMake ---
+CMakeUserPresets.json
+
+# --- Bỏ qua các file biên dịch ---
+*.exe
+*.dll
+*.pdb
+*.obj
+*.ilk
