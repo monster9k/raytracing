@@ -44,3 +44,50 @@
 
 **Kết quả mong đợi:**
 - Chạy chương trình, màn hình hiển thị toàn bộ một màu do mình định nghĩa trong code (không phải màu đen mặc định).
+
+
+## [Giai đoạn 2] - Toán học & Camera cơ bản
+**Mục tiêu:** Xây dựng các class toán học cốt lõi và render bầu trời dựa trên tia sáng (Rays).
+
+
+### 2.1. Xây dựng Class Vector3 (Vec3.h)
+- [x] Tạo file `include/Vec3.h`.
+- [x] Định nghĩa 3 thành phần: `double x, y, z`.
+- [x] **Operator Overloading:** Cài đặt các toán tử `+`, `-`, `*`, `/` để cộng trừ vector như số học.
+- [x] **Utility Functions:**
+    - `dot(v1, v2)`: Tích vô hướng (tính góc/ánh sáng).
+    - `cross(v1, v2)`: Tích có hướng (tìm pháp tuyến).
+    - `unit_vector(v)`: Chuẩn hóa vector về độ dài 1.
+- [x] Định nghĩa `using Color = Vec3;` để code rõ nghĩa hơn.
+
+### 2.2. Xây dựng Class Ray (Ray.h)
+- [x] Tạo file `include/Ray.h`.
+- [x] Class gồm 2 thành phần `Vec3 origin` (gốc) và `Vec3 direction` (hướng).
+- [x] Hàm quan trọng nhất: `Point3D at(double t)` trả về vị trí tia sáng tại thời điểm t.
+      Công thức: `P(t) = origin + t * direction`.
+
+### 2.3. Tích hợp & Render Bầu trời (Gradient Sky)
+**Mục tiêu:** Sử dụng `Vec3` và `Ray` để tạo ra hình ảnh đầu tiên dựa trên hướng nhìn.
+
+- [x] **Thiết lập Camera ảo (Viewport):**
+    - Xác định khung nhìn ảo trong không gian 3D.
+    - `aspect_ratio` = 16:9.
+    - `viewport_height` = 2.0.
+    - `focal_length` = 1.0 (Khoảng cách từ mắt đến khung nhìn).
+    - Tính toán `lower_left_corner`: Điểm góc trái dưới cùng của màn hình ảo.
+
+- [x] **Tạo hàm `ray_color(Ray r)`:**
+    - Input: Một tia sáng bắn ra từ camera.
+    - Logic: Lấy hướng `unit_direction.y` (từ -1.0 đến 1.0) chuyển về `t` (0.0 đến 1.0).
+    - Công thức pha màu (Linear Interpolation / Lerp):
+      `color = (1.0 - t)*White + t*Blue`.
+    - Kết quả: Bầu trời chuyển màu mượt mà từ trắng sang xanh.
+
+- [x] **Chuyển đổi hệ tọa độ (Coordinate Mapping):**
+    - Ánh xạ từ pixel màn hình `(i, j)` sang tọa độ texture `(u, v)` trong khoảng [0,1].
+    - Lưu ý: Đảo ngược trục Y (`image_height - 1 - j`) vì SDL gốc (0,0) ở trên cùng, còn 3D gốc (0,0) ở dưới cùng.
+
+- [x] **Helper `to_argb`:**
+    - Chuyển đổi màu `Vec3` (float 0.0 - 1.0) sang `uint32_t` (byte 0 - 255) để SDL hiển thị.
+
+**Kết quả:** Cửa sổ hiển thị background gradient xanh dương - trắng đúng chuẩn Raytracing.
