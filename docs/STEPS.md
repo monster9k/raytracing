@@ -91,3 +91,23 @@
     - Chuyển đổi màu `Vec3` (float 0.0 - 1.0) sang `uint32_t` (byte 0 - 255) để SDL hiển thị.
 
 **Kết quả:** Cửa sổ hiển thị background gradient xanh dương - trắng đúng chuẩn Raytracing.
+
+## [Giai đoạn 3] - Vật thể đầu tiên: Quả cầu đỏ
+**Mục tiêu:** Tính toán giao điểm giữa tia Ray và Quả cầu (Ray-Sphere Intersection).
+
+### 3.1. Lý thuyết va chạm (Math)
+- [x] Hiểu phương trình mặt cầu: `dot((P-C), (P-C)) = r^2`.
+- [x] Thiết lập phương trình bậc 2: `at^2 + bt + c = 0`.
+    - `a = dot(ray_direction, ray_direction)`
+    - `b = 2.0 * dot(oc, ray_direction)` (với `oc = origin - center`)
+    - `c = dot(oc, oc) - radius*radius`
+- [x] Tính Delta (discriminant): `delta = b*b - 4*a*c`.
+
+### 3.2. Cài đặt hàm `hit_sphere`
+- [x] Viết hàm `bool hit_sphere(center, radius, ray)` trả về true/false.
+- [x] Cập nhật hàm `ray_color`:
+    - Nếu `hit_sphere` trả về true -> Trả về màu Đỏ `Color(1, 0, 0)`.
+    - Nếu false -> Trả về màu bầu trời (gradient cũ).
+
+**Kết quả mong đợi:**
+- Màn hình hiển thị một hình tròn màu đỏ nằm giữa nền trời xanh. (Lưu ý: Nó là hình cầu 3D, nhưng vì chưa có ánh sáng bóng đổ nên nhìn như hình tròn dẹt 2D).

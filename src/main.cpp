@@ -7,12 +7,25 @@
 #define width 800 
 #define height 600
 
+bool hit_sphere(const Point3& center, double radious, const Ray& r) {
+    Vec3 oc = center - r.origin();
+    auto a = dot(r.direction(), r.direction());
+    auto b = -2.0 * dot(r.direction(), oc);
+    auto c = dot(oc, oc) - radious * radious;
+    auto discriminant = b * b - 4 * a * c;
+    return discriminant >= 0;
+}
+
+
 Color ray_color(const Ray& r) {
+    if (hit_sphere(Point3(0,0,-1), 0.5, r)) {
+        return Color(1,0,0);
+    }
     Vec3 unit_direction = unit_vector(r.direction());
     auto t = 0.5 * (unit_direction.y + 1.0);
     Color white(1.0, 1.0, 1.0);
     Color blue(0.5, 0.7, 1.0);
-    return (1 - t) * white + t * blue; 
+    return (1.0 - t) * white + t * blue; 
 }
 
 uint32_t to_argb(const Color& pixel_color) {
@@ -32,7 +45,7 @@ int main(int argc, char* argv[]) {
     }
 
     auto aspect_ratio = 16.0 / 9.0;
-    int image_width = 400;
+    int image_width = 800;
 
 
     // Calculate the image height, and ensure that it's at least 1.
@@ -54,11 +67,11 @@ int main(int argc, char* argv[]) {
     auto focal_lenght = 1.0;
     auto viewport_height = 2.0;
     auto viewport_width = viewport_height * (double(image_width) / image_height);
-    auto camera_center = Vec3(0, 0, 0);
+    auto camera_center = Vec3(0, 0, 0); // mat camera
 
     // Calculate the vectors across the horizontal and down the vertical viewport edges
-    auto viewport_u = Vec3(image_width, 0, 0 );
-    auto viewport_v = Vec3(0, -image_height, 0);
+    auto viewport_u = Vec3(viewport_width, 0, 0 );
+    auto viewport_v = Vec3(0, -viewport_height, 0);
     
     // Calculate the horizontal and vertical delta vectors from pixel to pixel.
     auto pixel_delta_u = viewport_u / image_width;
