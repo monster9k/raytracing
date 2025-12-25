@@ -111,3 +111,23 @@
 
 **Kết quả mong đợi:**
 - Màn hình hiển thị một hình tròn màu đỏ nằm giữa nền trời xanh. (Lưu ý: Nó là hình cầu 3D, nhưng vì chưa có ánh sáng bóng đổ nên nhìn như hình tròn dẹt 2D).
+
+
+## [Giai đoạn 4] - Hiển thị độ cong 3D (Surface Normals)
+**Mục tiêu:** Thay màu đỏ đơn điệu bằng bản đồ pháp tuyến (Normal Map) để nhìn thấy hình khối 3D thực sự.
+
+### 4.1. Tính toán Vector pháp tuyến
+- [x] Công thức: `normal = unit_vector(hit_point - center)`.
+- [x] Logic: Vector pháp tuyến của mặt cầu chính là hướng từ Tâm cầu đi ra điểm bề mặt.
+
+### 4.2. Tô màu theo pháp tuyến
+- [x] Logic toán học: Vector pháp tuyến có giá trị từ -1 đến 1. Màu sắc cần từ 0 đến 1.
+- [x] Công thức chuyển đổi: `color = 0.5 * (normal + 1.0)`.
+    - Ví dụ: Normal (-1, -1, 0) -> Color (0, 0, 0.5).
+- [x] Cập nhật hàm `hit_sphere` để trả về giá trị `t` (thời điểm va chạm) thay vì chỉ true/false, để ta tính được tọa độ điểm va chạm `P(t)`.
+
+**Kết quả mong đợi:**
+- Một quả cầu "cầu vồng":
+    - Đỉnh cầu: Màu xanh lá (Y dương).
+    - Bên phải: Màu đỏ (X dương).
+    - Phía trước: Màu xanh dương (Z dương).

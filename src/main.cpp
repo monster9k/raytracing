@@ -7,25 +7,32 @@
 #define width 800 
 #define height 600
 
-bool hit_sphere(const Point3& center, double radious, const Ray& r) {
+double  hit_sphere(const Point3& center, double radious, const Ray& r) {
     Vec3 oc = center - r.origin();
     auto a = dot(r.direction(), r.direction());
     auto b = -2.0 * dot(r.direction(), oc);
     auto c = dot(oc, oc) - radious * radious;
     auto discriminant = b * b - 4 * a * c;
-    return discriminant >= 0;
+    if (discriminant < 0) {
+        return -1.0;
+    }
+    else {
+        return (-b - std::sqrt(discriminant)) / (2.0 * a);
+    }
 }
 
 
 Color ray_color(const Ray& r) {
-    if (hit_sphere(Point3(0,0,-1), 0.5, r)) {
-        return Color(1,0,0);
+    auto t = hit_sphere(Point3(0, 0, -1), 0.5, r);
+    if (t > 0.0) {
+        Vec3 N = unit_vector(r.at(t) - Vec3(0, 0, -1));
+        return 0.5 * Color(N.x + 1, N.y + 1, N.z + 1);
     }
     Vec3 unit_direction = unit_vector(r.direction());
-    auto t = 0.5 * (unit_direction.y + 1.0);
+    auto t2 = 0.5 * (unit_direction.y + 1.0);
     Color white(1.0, 1.0, 1.0);
     Color blue(0.5, 0.7, 1.0);
-    return (1.0 - t) * white + t * blue; 
+    return (1.0 - t2) * white + t2 * blue; 
 }
 
 uint32_t to_argb(const Color& pixel_color) {
@@ -39,7 +46,7 @@ uint32_t to_argb(const Color& pixel_color) {
 
 
 int main(int argc, char* argv[]) {
-    if (SDL_Init(SDL_INIT_VIDEO || SDL_INIT_AUDIO)) {
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
         std::cerr << "SDL could not initialize! SDL_Error:" << SDL_GetError();
         return 1;
     }
@@ -85,6 +92,21 @@ int main(int argc, char* argv[]) {
 
     std::vector<uint32_t> buffer(image_width * image_height);
 
+    for (int j = 0; j < image_height; j++) {
+        for (int i = 0; i < image_width; i++) {
+            auto pixel_center = pixel00_loc + (i * pixel_delta_u) + (j * pixel_delta_v);
+
+            auto ray_direction = pixel_center - camera_center;
+
+            Ray r(camera_center, ray_direction);
+            Color pixel_color = ray_color(r);
+
+            buffer[j * image_width + i] = to_argb(pixel_color);
+        }
+    }
+    /*std::cout << sizeof(uint32_t);*/
+    SDL_UpdateTexture(texture, NULL, buffer.data(), image_width * sizeof(uint32_t));
+
     bool running = true;
     while (running) {
         SDL_Event event;
@@ -93,23 +115,12 @@ int main(int argc, char* argv[]) {
                 running = false;
            }
 
-            for (int j = 0; j < image_height; j++) {
-                for (int i = 0; i < image_width; i++) {
-                    auto pixel_center = pixel00_loc + (i * pixel_delta_u) + (j * pixel_delta_v);
-
-                    auto ray_direction = pixel_center - camera_center;
-
-                    Ray r(camera_center, ray_direction);
-                    Color pixel_color = ray_color(r);
-
-                    buffer[j * image_width + i] = to_argb(pixel_color);
-                }
-            }
-            /*std::cout << sizeof(uint32_t);*/
-            SDL_UpdateTexture(texture, NULL, buffer.data(), image_width * sizeof(uint32_t)); 
-            SDL_RenderCopy(renderer, texture, NULL, NULL);
-            SDL_RenderPresent(renderer);
+            
+            
         }
+
+        SDL_RenderCopy(renderer, texture, NULL, NULL);
+        SDL_RenderPresent(renderer);
     }
     SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);
